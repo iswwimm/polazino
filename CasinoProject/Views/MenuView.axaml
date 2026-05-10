@@ -1,0 +1,136 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CasinoProject.ViewModels"
+             x:Class="CasinoProject.Views.MenuView"
+             x:DataType="vm:MenuViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="Border.GameCard">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.3"/>
+                    <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.3"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        
+        <Style Selector="Border.GameCard:pointerover">
+            <Setter Property="RenderTransform" Value="translateY(-10px)"/>
+            <Setter Property="BorderBrush" Value="#ff007f"/>
+            <Setter Property="BoxShadow" Value="0 25 50 0 #E6000000"/>
+        </Style>
+
+        <Style Selector="Border.GameCard Button.PlayBtn">
+            <Setter Property="Opacity" Value="0"/>
+            <Setter Property="RenderTransform" Value="scale(0.8)"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.GameCard:pointerover Button.PlayBtn">
+            <Setter Property="Opacity" Value="1"/>
+            <Setter Property="RenderTransform" Value="scale(1)"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Background="Transparent" Margin="50,40">
+        <StackPanel>
+            
+            <TextBlock Text="🔥 TRENDING NOW" Foreground="#ffffff" FontSize="24" FontWeight="Black" LetterSpacing="1" Margin="0,0,0,30"/>
+
+            <WrapPanel ItemWidth="280" ItemHeight="200">
+                
+                <Border Classes="GameCard" CornerRadius="16" BorderBrush="#15ffffff" BorderThickness="1" Margin="0,0,25,25" ClipToBounds="True" Cursor="Hand">
+                    <Border.Background>
+                        <RadialGradientBrush Center="100%,0%" RadiusX="150%" RadiusY="150%">
+                            <GradientStop Color="#3a1c71" Offset="0"/>
+                            <GradientStop Color="#d76d77" Offset="0.5"/>
+                            <GradientStop Color="#ffaf7b" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Border.Background>
+                    <Grid>
+                        <Border>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
+                                    <GradientStop Color="#E6000000" Offset="0"/>
+                                    <GradientStop Color="#00000000" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                        
+                        <Button Classes="PlayBtn" Command="{Binding PlaySlotsCommand}" Content="PLAY NOW" 
+                                Background="#ff007f" Foreground="White" FontWeight="Black" LetterSpacing="1" 
+                                CornerRadius="30" Padding="30,12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                        <StackPanel VerticalAlignment="Bottom" Margin="20">
+                            <TextBlock Text="NEON FRUITS" Foreground="White" FontSize="22" FontWeight="Black" LetterSpacing="1"/>
+                            <TextBlock Text="PolAzino Originals" Foreground="#f5c518" FontSize="12" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Classes="GameCard" CornerRadius="16" BorderBrush="#15ffffff" BorderThickness="1" Margin="0,0,25,25" ClipToBounds="True" Cursor="Hand">
+                    <Border.Background>
+                        <RadialGradientBrush Center="0%,0%" RadiusX="150%" RadiusY="150%">
+                            <GradientStop Color="#11998e" Offset="0"/>
+                            <GradientStop Color="#38ef7d" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Border.Background>
+                    <Grid>
+                        <Border>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
+                                    <GradientStop Color="#E6000000" Offset="0"/>
+                                    <GradientStop Color="#00000000" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                        
+                        <Button Classes="PlayBtn" Command="{Binding PlayRouletteCommand}" Content="PLAY NOW" 
+                                Background="#ff007f" Foreground="White" FontWeight="Black" LetterSpacing="1" 
+                                CornerRadius="30" Padding="30,12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        
+                        <StackPanel VerticalAlignment="Bottom" Margin="20">
+                            <TextBlock Text="LIVE ROULETTE" Foreground="White" FontSize="22" FontWeight="Black" LetterSpacing="1"/>
+                            <TextBlock Text="Evolution Gaming" Foreground="#8b92a5" FontSize="12" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border Classes="GameCard" CornerRadius="16" BorderBrush="#15ffffff" BorderThickness="1" Margin="0,0,25,25" ClipToBounds="True" Cursor="Hand">
+                    <Border.Background>
+                        <RadialGradientBrush Center="50%,50%" RadiusX="150%" RadiusY="150%">
+                            <GradientStop Color="#2980b9" Offset="0"/>
+                            <GradientStop Color="#2c3e50" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Border.Background>
+                    <Grid>
+                        <Border>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
+                                    <GradientStop Color="#E6000000" Offset="0"/>
+                                    <GradientStop Color="#00000000" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+                        
+                        <Button Classes="PlayBtn" Command="{Binding PlayBlackjackCommand}" Content="PLAY NOW" 
+                                Background="#ff007f" Foreground="White" FontWeight="Black" LetterSpacing="1" 
+                                CornerRadius="30" Padding="30,12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        
+                        <StackPanel VerticalAlignment="Bottom" Margin="20">
+                            <TextBlock Text="BLACKJACK PRO" Foreground="White" FontSize="22" FontWeight="Black" LetterSpacing="1"/>
+                            <TextBlock Text="PolAzino Originals" Foreground="#f5c518" FontSize="12" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+            </WrapPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

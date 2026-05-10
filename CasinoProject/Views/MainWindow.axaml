@@ -1,0 +1,129 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:CasinoProject.ViewModels"
+        xmlns:core="using:CasinoProject.Core"
+        x:Class="CasinoProject.Views.MainWindow"
+        x:DataType="vm:MainViewModel" 
+        Title="PolAzino - Desktop Casino Platform" Width="1200" Height="800"
+        Background="#0b0e14"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Styles>
+        <Style Selector="Button.NavItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#5c667a"/> <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Foreground" Duration="0:0:0.2"/>
+                    <BrushTransition Property="Background" Duration="0:0:0.2"/>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2"/>
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button.NavItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Foreground" Value="#ffffff"/>
+            <Setter Property="Background" Value="#10ffffff"/>
+        </Style>
+
+        <Style Selector="Button.Active">
+            <Setter Property="Foreground" Value="#ffffff"/>
+            
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                        <GradientStop Color="#1A00ff7f" Offset="0"/>
+                        <GradientStop Color="#00000000" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            
+            <Setter Property="BorderBrush" Value="#ff007f"/>
+            <Setter Property="BorderThickness" Value="4,0,0,0"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid ColumnDefinitions="260, *">
+        
+        <Border Grid.Column="0" Background="#070a0f" BorderBrush="#15ffffff" BorderThickness="0,0,1,0" Padding="15,30">
+            <StackPanel>
+                <TextBlock Text="POLAZINO" FontSize="28" FontWeight="Black" LetterSpacing="3" HorizontalAlignment="Center" Margin="0,0,0,40">
+                    <TextBlock.Foreground>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                            <GradientStop Color="#f5c518" Offset="0"/>
+                            <GradientStop Color="#ff007f" Offset="1"/>
+                        </LinearGradientBrush>
+                    </TextBlock.Foreground>
+                </TextBlock>
+
+                <TextBlock Text="CASINO" Foreground="#3d4659" FontSize="11" FontWeight="Bold" LetterSpacing="2" Margin="15,0,0,15"/>
+                <StackPanel Spacing="4">
+                    <Button Classes="NavItem Active" Content="🔥  Lobby" Command="{Binding GoToMenuCommand}"/>
+                    <Button Classes="NavItem" Content="🎰  Slots" />
+                    <Button Classes="NavItem" Content="🃏  Live Casino" />
+                    <Button Classes="NavItem" Content="🎲  Table Games" />
+                    <Button Classes="NavItem" Content="🚀  Crash Games" />
+                </StackPanel>
+
+                <TextBlock Text="ACCOUNT" Foreground="#3d4659" FontSize="11" FontWeight="Bold" LetterSpacing="2" Margin="15,30,0,15"/>
+                <StackPanel Spacing="4">
+                    <Button Classes="NavItem" Content="👤  Profile" />
+                    <Button Classes="NavItem" Content="🎁  Bonuses" />
+                    <Button Classes="NavItem" Content="⚙️  Settings" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Column="1" RowDefinitions="90, *">
+            <Grid.Background>
+                <RadialGradientBrush Center="100%,0%" RadiusX="120%" RadiusY="120%">
+                    <GradientStop Color="#131722" Offset="0"/>
+                    <GradientStop Color="#0b0e14" Offset="0.7"/>
+                </RadialGradientBrush>
+            </Grid.Background>
+
+            <Border Grid.Row="0" Background="Transparent" Padding="40,0">
+                <Grid ColumnDefinitions="*, Auto">
+                    <TextBlock Grid.Column="0" Text="Welcome back, Player! ♠️" Foreground="#e1e1e1" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
+                        <Border Background="#1c212e" CornerRadius="40" Padding="20,10" BorderBrush="#15ffffff" BorderThickness="1">
+                            <StackPanel Orientation="Horizontal" Spacing="15">
+                                <StackPanel>
+                                    <TextBlock Text="REAL MONEY" Foreground="#5c667a" FontSize="9" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Source={x:Static core:SessionManager.Instance}, Path=Balance, StringFormat='${0:N2}'}" Foreground="White" FontSize="16" FontWeight="Bold"/>
+                                </StackPanel>
+                                
+                                <Button Content="WITHDRAW" Command="{Binding GoToWithdrawCommand}" 
+                                        Background="#252b3a" Foreground="White" CornerRadius="20" Padding="15,5" FontSize="11" FontWeight="Bold"/>
+                                
+                                <Button Content="DEPOSIT" Command="{Binding GoToTopUpCommand}" 
+                                        Foreground="Black" CornerRadius="20" Padding="20,5" FontSize="11" FontWeight="Heavy">
+                                    <Button.Background>
+                                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                            <GradientStop Color="#ff8a00" Offset="0"/>
+                                            <GradientStop Color="#f5c518" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Button.Background>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <ScrollViewer Grid.Row="1">
+                <TransitioningContentControl Content="{Binding CurrentView}">
+                    <TransitioningContentControl.PageTransition>
+                        <CrossFade Duration="0:0:0.2" />
+                    </TransitioningContentControl.PageTransition>
+                </TransitioningContentControl>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>

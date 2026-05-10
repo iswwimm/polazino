@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CasinoProject.ViewModels"
+             x:Class="CasinoProject.Views.WithdrawView"
+             x:DataType="vm:WithdrawViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="TextBox, ComboBox, NumericUpDown">
+            <Setter Property="Background" Value="#0f121a"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
+            <Setter Property="BorderBrush" Value="#1Affffff"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement, ComboBox:focus /template/ Border#PART_BorderElement, NumericUpDown:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="#ff007f"/> <Setter Property="Background" Value="#0f121a"/>
+        </Style>
+        
+        <Style Selector="Button.ActionBtn">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Black"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="0,18"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="LetterSpacing" Value="1"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.ActionBtn:pointerover">
+            <Setter Property="RenderTransform" Value="translateY(-4px)"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        
+        <Border Width="450" Background="#161b28" CornerRadius="24" Padding="40" 
+                BorderBrush="#1Affffff" BorderThickness="1"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                BoxShadow="0 25 50 0 #99000000">
+            
+            <StackPanel Spacing="18">
+                
+                <Button Content="✕" Command="{Binding GoBackToMenuCommand}" 
+                        Background="Transparent" Foreground="#8b92a5" FontSize="20" FontWeight="Bold"
+                        HorizontalAlignment="Right" Margin="0,-20,-20,0" Padding="10"/>
+
+                <TextBlock Text="WITHDRAW WINNINGS" FontSize="24" FontWeight="Black" LetterSpacing="1"
+                           Foreground="#ff007f" HorizontalAlignment="Center" Margin="0,-10,0,5"/>
+
+                <StackPanel HorizontalAlignment="Center" Margin="0,0,0,15">
+                    <TextBlock Text="AVAILABLE BALANCE" Foreground="#8b92a5" FontSize="11" FontWeight="Bold" LetterSpacing="1" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding CurrentBalance, StringFormat='${0:N2}'}" Foreground="White" FontSize="24" FontWeight="Black" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <TextBlock Text="WITHDRAWAL METHOD" Foreground="#8b92a5" FontSize="11" FontWeight="Bold" LetterSpacing="1" Margin="0,0,0,-10"/>
+                <ComboBox ItemsSource="{Binding PayoutMethods}" 
+                          SelectedItem="{Binding SelectedMethod}" 
+                          IsEnabled="{Binding !IsProcessing}"
+                          HorizontalAlignment="Stretch"/>
+
+                <StackPanel Spacing="15" IsVisible="{Binding IsBankVisible}">
+                    <TextBlock Text="BANK ACCOUNT (IBAN)" Foreground="#8b92a5" FontSize="11" FontWeight="Bold" LetterSpacing="1" Margin="0,0,0,-10"/>
+                    <TextBox Text="{Binding BankAccount}" PlaceholderText="PL 00 0000 0000..." IsEnabled="{Binding !IsProcessing}"/>
+                </StackPanel>
+
+                <StackPanel Spacing="15" IsVisible="{Binding IsPayPalVisible}">
+                    <TextBlock Text="PAYPAL EMAIL" Foreground="#8b92a5" FontSize="11" FontWeight="Bold" LetterSpacing="1" Margin="0,0,0,-10"/>
+                    <TextBox Text="{Binding PaypalEmail}" PlaceholderText="player@email.com" IsEnabled="{Binding !IsProcessing}"/>
+                </StackPanel>
+
+                <StackPanel Spacing="15" IsVisible="{Binding IsCryptoVisible}">
+                    <TextBlock Text="CRYPTO WALLET ADDRESS" Foreground="#8b92a5" FontSize="11" FontWeight="Bold" LetterSpacing="1" Margin="0,0,0,-10"/>
+                    <TextBox Text="{Binding CryptoWallet}" PlaceholderText="0x..." IsEnabled="{Binding !IsProcessing}"/>
+                </StackPanel>
+
+                <TextBlock Text="AMOUNT TO CASH OUT" Foreground="#8b92a5" FontSize="11" FontWeight="Bold" LetterSpacing="1" Margin="0,10,0,-10"/>
+                <NumericUpDown Value="{Binding Amount}" Minimum="1" Maximum="{Binding CurrentBalance}" 
+                               IsEnabled="{Binding !IsProcessing}"
+                               Height="50" FontSize="18" FontWeight="Bold"/>
+
+                <Button Classes="ActionBtn" Content="PROCESS WITHDRAWAL" Command="{Binding ProcessWithdrawalCommand}" 
+                        Margin="0,15,0,0" IsEnabled="{Binding !IsProcessing}">
+                    <Button.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                            <GradientStop Color="#ff007f" Offset="0"/>
+                            <GradientStop Color="#8e44ad" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                </Button>
+                
+                <TextBlock Text="Withdrawal processing time: 0-24 hours" Foreground="#5c667a" FontSize="11" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+
+                <TextBlock Text="{Binding StatusMessage}" Foreground="#ff007f" 
+                           FontWeight="SemiBold" HorizontalAlignment="Center" 
+                           TextWrapping="Wrap" TextAlignment="Center" Margin="0,5,0,0"/>
+                
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
