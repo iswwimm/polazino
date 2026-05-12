@@ -49,5 +49,9 @@ public partial class MainViewModel : ObservableObject, IRecipient<NavigationMess
         {
             CurrentView = new MenuViewModel();
         }
+        else if (message.TargetView == "Blackjack")
+        {
+            CurrentView = new BlackjackViewModel();
+        }
     }
 }
