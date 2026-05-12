@@ -1,0 +1,122 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CasinoProject.ViewModels"
+             xmlns:models="using:CasinoProject.Models"
+             x:Class="CasinoProject.Views.ArkanoidView"
+             x:DataType="vm:ArkanoidViewModel"
+             Focusable="True"
+             KeyDown="OnKeyDown"
+             KeyUp="OnKeyUp"
+             Loaded="OnLoaded">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header / Betting Info -->
+        <Border Grid.Row="0" Background="#1c1c28" Padding="20">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+
+                <!-- Back Button -->
+                <Button Grid.Column="0" Command="{Binding ReturnToMenuCommand}"
+                        Background="Transparent" Foreground="White" FontSize="16" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <TextBlock Text="⬅" />
+                        <TextBlock Text="BACK TO MENU" FontWeight="Bold" />
+                    </StackPanel>
+                </Button>
+
+                <!-- Game Stats -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="30">
+                    <StackPanel>
+                        <TextBlock Text="BALANCE" Foreground="#8b92a5" FontSize="12" FontWeight="Bold" />
+                        <TextBlock Text="{Binding SessionBalance, StringFormat='{}{0}$'}" Foreground="White" FontSize="20" FontWeight="Black" />
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="CURRENT WINNINGS" Foreground="#8b92a5" FontSize="12" FontWeight="Bold" />
+                        <TextBlock Text="{Binding CurrentWinnings, StringFormat='{}{0}$'}" Foreground="#38ef7d" FontSize="20" FontWeight="Black" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Game Area -->
+        <Border Grid.Row="1" Background="#111116" ClipToBounds="True">
+            <Viewbox>
+                <!-- Keep game size fixed 800x600 inside Viewbox to scale -->
+                <Grid Width="800" Height="600">
+                    <Canvas Background="Transparent">
+
+                        <!-- Blocks -->
+                        <ItemsControl ItemsSource="{Binding Blocks}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="models:Block">
+                                    <Border Width="{Binding Width}" Height="{Binding Height}"
+                                            CornerRadius="4" IsVisible="{Binding IsVisible}"
+                                            Background="{Binding Color}"
+                                            BorderBrush="#40ffffff" BorderThickness="1">
+                                        <Border.BoxShadow>
+                                            <BoxShadows>0 0 10 0 #40000000</BoxShadows>
+                                        </Border.BoxShadow>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.Styles>
+                                <Style Selector="ContentPresenter" x:DataType="models:Block">
+                                    <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                                </Style>
+                            </ItemsControl.Styles>
+                        </ItemsControl>
+
+                        <!-- Paddle -->
+                        <Border Width="100" Height="20" CornerRadius="10"
+                                Background="#f5c518"
+                                Canvas.Left="{Binding PaddleX}" Canvas.Top="550">
+                            <Border.BoxShadow>
+                                <BoxShadows>0 0 15 0 #80f5c518</BoxShadows>
+                            </Border.BoxShadow>
+                        </Border>
+
+                        <!-- Ball -->
+                        <Ellipse Width="20" Height="20"
+                                 Fill="White"
+                                 Canvas.Left="{Binding BallX}" Canvas.Top="{Binding BallY}">
+                            <Ellipse.Effect>
+                                <DropShadowEffect BlurRadius="10" Color="White" />
+                            </Ellipse.Effect>
+                        </Ellipse>
+                    </Canvas>
+
+                    <!-- Game Overlay (Status / Start) -->
+                    <Border IsVisible="{Binding ShowGameStatus}" Background="#C0000000" CornerRadius="16" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="40" MinWidth="300">
+                        <StackPanel Spacing="20" HorizontalAlignment="Center">
+                            <TextBlock Text="ARKANOID" Foreground="#ff007f" FontSize="36" FontWeight="Black" HorizontalAlignment="Center" LetterSpacing="2"/>
+
+                            <TextBlock Text="{Binding GameStatusMessage}" Foreground="White" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="BET AMOUNT:" Foreground="#8b92a5" FontSize="12" FontWeight="Bold" />
+                                <NumericUpDown Value="{Binding BetAmount}" Minimum="1" Maximum="{Binding SessionBalance}" Background="#222230" Foreground="White" />
+                            </StackPanel>
+
+                            <Button Command="{Binding StartGameCommand}" Content="PLAY ROUND"
+                                    Background="#ff007f" Foreground="White" FontWeight="Black" FontSize="16"
+                                    CornerRadius="30" Padding="40,15" HorizontalAlignment="Center" Cursor="Hand">
+                                <Button.Styles>
+                                    <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="#e60073"/>
+                                    </Style>
+                                </Button.Styles>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Viewbox>
+        </Border>
+    </Grid>
+</UserControl>
