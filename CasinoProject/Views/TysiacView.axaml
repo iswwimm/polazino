@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:CasinoProject.ViewModels"
+             x:Class="CasinoProject.Views.TysiacView"
+             x:DataType="vm:TysiacViewModel">
+
+    <Grid RowDefinitions="Auto, *, Auto" Margin="20">
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="SpaceBetween" Margin="0,0,0,20">
+            <TextBlock Text="KASYNOWY TYSIĄC" FontSize="24" FontWeight="Bold"/>
+            <TextBlock Text="{Binding CurrentBalance, StringFormat='Saldo: {0}$'}" FontSize="20" FontWeight="Bold" Foreground="Green"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Spacing="20" VerticalAlignment="Center">
+
+            <Border Background="#2C2C2C" Padding="15" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Karty Krupiera:" Foreground="Gray" Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding DealerCardsText}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding DealerScore, StringFormat='Punkty: {0}'}" Margin="0,5,0,0" Foreground="LightCoral"/>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="VS" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Foreground="Gray"/>
+
+            <Border Background="#2C2C2C" Padding="15" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="Twoje Karty (z meldunkami):" Foreground="Gray" Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding PlayerCardsText}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding PlayerScore, StringFormat='Punkty: {0}'}" Margin="0,5,0,0" Foreground="LightGreen"/>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="{Binding StatusMessage}"
+                       FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"
+                       Margin="0,20,0,0" TextWrapping="Wrap" TextAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="15" Margin="0,20,0,0">
+            <TextBlock Text="Stawka:" VerticalAlignment="Center"/>
+            <NumericUpDown Value="{Binding BetAmount}" Minimum="1" Maximum="1000" Width="120" IsEnabled="{Binding !IsProcessing}"/>
+
+            <Button Content="GRAJ" Command="{Binding PlayRoundAsync}"
+                    Background="Green" Foreground="White" Width="100" HorizontalContentAlignment="Center"
+                    IsEnabled="{Binding !IsProcessing}"/>
+
+            <Button Content="Wróć do Menu" Command="{Binding GoBackToMenu}"
+                    Background="DarkRed" Foreground="White" Width="120" HorizontalContentAlignment="Center"
+                    IsEnabled="{Binding !IsProcessing}"/>
+        </StackPanel>
+
+    </Grid>
+</UserControl>

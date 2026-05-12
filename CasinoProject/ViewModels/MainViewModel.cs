@@ -41,6 +41,10 @@ public partial class MainViewModel : ObservableObject, IRecipient<NavigationMess
         {
             CurrentView = new TopUpViewModel();
         }
+        else if (message.TargetView == "Tysiac")
+        {
+            CurrentView = new TysiacViewModel();
+        }
         else if (message.TargetView == "Withdraw")
         {
             CurrentView = new WithdrawViewModel();
