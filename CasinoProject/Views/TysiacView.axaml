@@ -4,7 +4,7 @@
              x:Class="CasinoProject.Views.TysiacView"
              x:DataType="vm:TysiacViewModel">
 
-    <Grid RowDefinitions="Auto, *, Auto" Margin="20">
+    <Grid RowDefinitions="Auto, *, Auto" Margin="25">
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="SpaceBetween" Margin="0,0,0,20">
             <TextBlock Text="KASYNOWY TYSIĄC" FontSize="24" FontWeight="Bold"/>
