@@ -68,6 +68,7 @@
                     <Button Classes="NavItem" Content="🃏  Live Casino" />
                     <Button Classes="NavItem" Content="🎲  Table Games" />
                     <Button Classes="NavItem" Content="🚀  Crash Games" />
+                    <Button Classes="NavItem" Content="🃏  Tysiąc" Command="{Binding PlayTysiacCommand}" />
                 </StackPanel>
 
                 <TextBlock Text="ACCOUNT" Foreground="#3d4659" FontSize="11" FontWeight="Bold" LetterSpacing="2" Margin="15,30,0,15"/>
