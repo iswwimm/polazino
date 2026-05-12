@@ -9,7 +9,7 @@
              KeyUp="OnKeyUp"
              Loaded="OnLoaded">
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*" Height="{Binding $parent[ScrollViewer].Bounds.Height}">
 
         <!-- Header / Betting Info -->
         <Border Grid.Row="0" Background="#1c1c28" Padding="20">
@@ -41,13 +41,13 @@
 
         <!-- Game Area -->
         <Border Grid.Row="1" Background="#111116" ClipToBounds="True">
-            <Viewbox>
+            <Viewbox Stretch="Uniform">
                 <!-- Keep game size fixed 800x600 inside Viewbox to scale -->
                 <Grid Width="800" Height="600">
                     <Canvas Background="Transparent">
 
                         <!-- Blocks -->
-                        <ItemsControl ItemsSource="{Binding Blocks}">
+                        <ItemsControl ItemsSource="{Binding Blocks}" Width="800" Height="600">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <Canvas />
@@ -66,7 +66,80 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                             <ItemsControl.Styles>
-                                <Style Selector="ContentPresenter" x:DataType="models:Block">
+                                <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:Block">
+                                    <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                                </Style>
+                            </ItemsControl.Styles>
+                        </ItemsControl>
+
+                        <!-- Bonuses -->
+                        <ItemsControl ItemsSource="{Binding Bonuses}" Width="800" Height="600">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="models:Bonus">
+                                    <Border Width="{Binding Width}" Height="{Binding Height}" CornerRadius="15" 
+                                            IsVisible="{Binding IsVisible}" Background="{Binding Color}">
+                                        <TextBlock Text="{Binding Symbol}" Foreground="White" FontWeight="Bold" 
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.Styles>
+                                <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:Bonus">
+                                    <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                                </Style>
+                            </ItemsControl.Styles>
+                        </ItemsControl>
+
+                        <!-- Projectiles (Lasers) -->
+                        <ItemsControl ItemsSource="{Binding Projectiles}" Width="800" Height="600">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="models:Projectile">
+                                    <Border Width="{Binding Width}" Height="{Binding Height}" 
+                                            IsVisible="{Binding IsVisible}" Background="#e74c3c" CornerRadius="2">
+                                        <Border.BoxShadow>
+                                            <BoxShadows>0 0 10 0 #80e74c3c</BoxShadows>
+                                        </Border.BoxShadow>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.Styles>
+                                <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:Projectile">
+                                    <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                                </Style>
+                            </ItemsControl.Styles>
+                        </ItemsControl>
+
+                        <!-- Balls -->
+                        <ItemsControl ItemsSource="{Binding Balls}" Width="800" Height="600">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="models:BallModel">
+                                    <Ellipse Width="{Binding Size}" Height="{Binding Size}" Fill="White">
+                                        <Ellipse.Effect>
+                                            <DropShadowEffect BlurRadius="10" Color="White" />
+                                        </Ellipse.Effect>
+                                    </Ellipse>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.Styles>
+                                <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:BallModel">
                                     <Setter Property="Canvas.Left" Value="{Binding X}"/>
                                     <Setter Property="Canvas.Top" Value="{Binding Y}"/>
                                 </Style>
@@ -74,26 +147,17 @@
                         </ItemsControl>
 
                         <!-- Paddle -->
-                        <Border Width="100" Height="20" CornerRadius="10"
+                        <Border Width="{Binding PaddleWidth}" Height="20" CornerRadius="10"
                                 Background="#f5c518"
                                 Canvas.Left="{Binding PaddleX}" Canvas.Top="550">
                             <Border.BoxShadow>
                                 <BoxShadows>0 0 15 0 #80f5c518</BoxShadows>
                             </Border.BoxShadow>
                         </Border>
-
-                        <!-- Ball -->
-                        <Ellipse Width="20" Height="20"
-                                 Fill="White"
-                                 Canvas.Left="{Binding BallX}" Canvas.Top="{Binding BallY}">
-                            <Ellipse.Effect>
-                                <DropShadowEffect BlurRadius="10" Color="White" />
-                            </Ellipse.Effect>
-                        </Ellipse>
                     </Canvas>
 
                     <!-- Game Overlay (Status / Start) -->
-                    <Border IsVisible="{Binding ShowGameStatus}" Background="#C0000000" CornerRadius="16" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="40" MinWidth="300">
+                    <Border IsVisible="{Binding ShowGameStatus}" Background="#e6000000" CornerRadius="16" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="40" MinWidth="400">
                         <StackPanel Spacing="20" HorizontalAlignment="Center">
                             <TextBlock Text="ARKANOID" Foreground="#ff007f" FontSize="36" FontWeight="Black" HorizontalAlignment="Center" LetterSpacing="2"/>
 
@@ -113,6 +177,64 @@
                                     </Style>
                                 </Button.Styles>
                             </Button>
+
+                            <!-- Bonuses Legend -->
+                            <Border Background="#20ffffff" CornerRadius="10" Padding="15" Margin="0,15,0,0">
+                                <StackPanel Spacing="10">
+                                    <TextBlock Text="BONUSES (Spacebar to trigger Laser/Sticky)" Foreground="#8b92a5" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*">
+
+                                        <!-- Expand -->
+                                        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="10" Margin="5">
+                                            <Border Width="20" Height="20" CornerRadius="10" Background="#3498db">
+                                                <TextBlock Text="↔" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Expand" Foreground="White" VerticalAlignment="Center" FontSize="12"/>
+                                        </StackPanel>
+
+                                        <!-- Slow -->
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="5">
+                                            <Border Width="20" Height="20" CornerRadius="10" Background="#2ecc71">
+                                                <TextBlock Text="S" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Slow Ball" Foreground="White" VerticalAlignment="Center" FontSize="12"/>
+                                        </StackPanel>
+
+                                        <!-- MultiBall -->
+                                        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="10" Margin="5">
+                                            <Border Width="20" Height="20" CornerRadius="10" Background="#9b59b6">
+                                                <TextBlock Text="M" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Multi-ball" Foreground="White" VerticalAlignment="Center" FontSize="12"/>
+                                        </StackPanel>
+
+                                        <!-- ExtraCash -->
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="5">
+                                            <Border Width="20" Height="20" CornerRadius="10" Background="#f1c40f">
+                                                <TextBlock Text="$" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Extra Cash" Foreground="White" VerticalAlignment="Center" FontSize="12"/>
+                                        </StackPanel>
+
+                                        <!-- Sticky -->
+                                        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Spacing="10" Margin="5">
+                                            <Border Width="20" Height="20" CornerRadius="10" Background="#e67e22">
+                                                <TextBlock Text="=" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Sticky Paddle" Foreground="White" VerticalAlignment="Center" FontSize="12"/>
+                                        </StackPanel>
+
+                                        <!-- Laser -->
+                                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="5">
+                                            <Border Width="20" Height="20" CornerRadius="10" Background="#e74c3c">
+                                                <TextBlock Text="⚡" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Text="Lasers" Foreground="White" VerticalAlignment="Center" FontSize="12"/>
+                                        </StackPanel>
+
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
                         </StackPanel>
                     </Border>
                 </Grid>

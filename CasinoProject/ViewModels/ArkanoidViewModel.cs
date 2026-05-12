@@ -19,20 +19,26 @@ public partial class ArkanoidViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private double _paddleX = 350;
     private const double PaddleY = 550;
-    private const double PaddleWidth = 100;
     private const double PaddleHeight = 20;
     private const double PaddleSpeed = 30;
 
     [ObservableProperty]
-    private double _ballX = 390;
+    private double _paddleWidth = 100;
+
     [ObservableProperty]
-    private double _ballY = 530;
-    private const double BallSize = 20;
-    private double _ballVelocityX = 5;
-    private double _ballVelocityY = -5;
+    private ObservableCollection<BallModel> _balls = new();
+
+    private const double DefaultBallVelocityX = 10;
+    private const double DefaultBallVelocityY = -10;
 
     [ObservableProperty]
     private ObservableCollection<Block> _blocks = new();
+
+    [ObservableProperty]
+    private ObservableCollection<Bonus> _bonuses = new();
+
+    [ObservableProperty]
+    private ObservableCollection<Projectile> _projectiles = new();
 
     [ObservableProperty]
     private int _betAmount = 100;
@@ -60,6 +66,9 @@ public partial class ArkanoidViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(SessionBalance));
         }
     }
+
+    private bool _hasLasers = false;
+    private bool _hasStickyPaddle = false;
 
     public ArkanoidViewModel()
     {
@@ -107,14 +116,21 @@ public partial class ArkanoidViewModel : ObservableObject, IDisposable
 
     private void InitializeLevel()
     {
+        PaddleWidth = 100;
         PaddleX = (CanvasWidth - PaddleWidth) / 2;
-        BallX = (CanvasWidth - BallSize) / 2;
-        BallY = PaddleY - BallSize - 5;
+        
+        _hasLasers = false;
+        _hasStickyPaddle = false;
 
-        _ballVelocityX = 5;
-        _ballVelocityY = -5;
+        Balls.Clear();
+        var initialBall = new BallModel((CanvasWidth - 20) / 2, PaddleY - 20 - 5);
+        initialBall.VelocityX = DefaultBallVelocityX;
+        initialBall.VelocityY = DefaultBallVelocityY;
+        Balls.Add(initialBall);
 
         Blocks.Clear();
+        Bonuses.Clear();
+        Projectiles.Clear();
 
         // Create some blocks
         int rows = 5;
@@ -144,56 +160,118 @@ public partial class ArkanoidViewModel : ObservableObject, IDisposable
 
     private void GameLoop(object? sender, EventArgs e)
     {
-        // Move ball
-        BallX += _ballVelocityX;
-        BallY += _ballVelocityY;
-
-        // Wall collisions
-        if (BallX <= 0 || BallX + BallSize >= CanvasWidth)
+        // Update Projectiles
+        foreach (var proj in Projectiles.ToList())
         {
-            _ballVelocityX *= -1;
-        }
-        if (BallY <= 0)
-        {
-            _ballVelocityY *= -1;
-        }
-
-        // Paddle collision
-        if (BallY + BallSize >= PaddleY && BallY + BallSize <= PaddleY + PaddleHeight &&
-            BallX + BallSize >= PaddleX && BallX <= PaddleX + PaddleWidth)
-        {
-            // Simple bounce, adjust based on hit position
-            _ballVelocityY *= -1;
-
-            // Adjust X velocity based on where it hit the paddle
-            double hitPoint = (BallX + BallSize / 2) - (PaddleX + PaddleWidth / 2);
-            _ballVelocityX = hitPoint * 0.15;
-
-            // Ensure ball is just above paddle to prevent getting stuck
-            BallY = PaddleY - BallSize;
-        }
-
-        // Block collisions
-        bool blockHit = false;
-        foreach (var block in Blocks.Where(b => b.IsVisible))
-        {
-            if (BallX + BallSize >= block.X && BallX <= block.X + block.Width &&
-                BallY + BallSize >= block.Y && BallY <= block.Y + block.Height)
+            if (!proj.IsVisible) continue;
+            
+            proj.Y -= 15; // Laser speed
+            if (proj.Y < 0)
             {
-                block.IsVisible = false;
-                blockHit = true;
+                proj.IsVisible = false;
+                Projectiles.Remove(proj);
+                continue;
+            }
 
-                // Calculate winnings per block: BetAmount * 0.1 (10% of bet per block)
-                CurrentWinnings += (int)(BetAmount * 0.1);
-
-                // Simple collision response - invert Y
-                _ballVelocityY *= -1;
-                break; // Only hit one block per frame
+            foreach (var block in Blocks.Where(b => b.IsVisible))
+            {
+                if (proj.X + proj.Width >= block.X && proj.X <= block.X + block.Width &&
+                    proj.Y <= block.Y + block.Height && proj.Y + proj.Height >= block.Y)
+                {
+                    proj.IsVisible = false;
+                    Projectiles.Remove(proj);
+                    HitBlock(block);
+                    break;
+                }
             }
         }
 
-        // Check lose condition (ball falls below paddle)
-        if (BallY > CanvasHeight)
+        // Update Bonuses
+        foreach (var bonus in Bonuses.ToList())
+        {
+            if (!bonus.IsVisible) continue;
+
+            bonus.Y += 3; // Fall speed
+
+            if (bonus.Y > CanvasHeight)
+            {
+                bonus.IsVisible = false;
+                Bonuses.Remove(bonus);
+                continue;
+            }
+
+            if (bonus.Y + bonus.Height >= PaddleY && bonus.Y <= PaddleY + PaddleHeight &&
+                bonus.X + bonus.Width >= PaddleX && bonus.X <= PaddleX + PaddleWidth)
+            {
+                bonus.IsVisible = false;
+                Bonuses.Remove(bonus);
+                ApplyBonus(bonus.Type);
+            }
+        }
+
+        // Move balls
+        foreach (var ball in Balls.ToList())
+        {
+            if (ball.IsStuck)
+            {
+                ball.X = PaddleX + ball.RelativeX;
+                ball.Y = PaddleY - ball.Size;
+                continue;
+            }
+
+            ball.X += ball.VelocityX;
+            ball.Y += ball.VelocityY;
+
+            // Wall collisions
+            if (ball.X <= 0 || ball.X + ball.Size >= CanvasWidth)
+            {
+                ball.VelocityX *= -1;
+            }
+            if (ball.Y <= 0)
+            {
+                ball.VelocityY *= -1;
+            }
+
+            // Paddle collision
+            if (ball.Y + ball.Size >= PaddleY && ball.Y + ball.Size <= PaddleY + PaddleHeight &&
+                ball.X + ball.Size >= PaddleX && ball.X <= PaddleX + PaddleWidth)
+            {
+                if (_hasStickyPaddle)
+                {
+                    ball.IsStuck = true;
+                    ball.RelativeX = ball.X - PaddleX;
+                    ball.Y = PaddleY - ball.Size;
+                }
+                else
+                {
+                    ball.VelocityY *= -1;
+                    if (ball.VelocityY > 0) ball.VelocityY *= -1; // Force up
+                    double hitPoint = (ball.X + ball.Size / 2) - (PaddleX + PaddleWidth / 2);
+                    ball.VelocityX = hitPoint * 0.15;
+                    ball.Y = PaddleY - ball.Size;
+                }
+            }
+
+            // Block collisions
+            foreach (var block in Blocks.Where(b => b.IsVisible))
+            {
+                if (ball.X + ball.Size >= block.X && ball.X <= block.X + block.Width &&
+                    ball.Y + ball.Size >= block.Y && ball.Y <= block.Y + block.Height)
+                {
+                    HitBlock(block);
+                    ball.VelocityY *= -1;
+                    break; // Only hit one block per frame per ball
+                }
+            }
+            
+            if (ball.Y > CanvasHeight)
+            {
+                Balls.Remove(ball);
+            }
+        }
+
+        // Check lose condition
+        if (!Balls.Any())
         {
             EndGame(false);
             return;
@@ -203,6 +281,85 @@ public partial class ArkanoidViewModel : ObservableObject, IDisposable
         if (!Blocks.Any(b => b.IsVisible))
         {
             EndGame(true);
+        }
+    }
+
+    private Random _rng = new Random();
+
+    private void HitBlock(Block block)
+    {
+        block.IsVisible = false;
+        CurrentWinnings += (int)(BetAmount * 0.1);
+
+        if (_rng.NextDouble() < 0.10) // 10% chance
+        {
+            Array values = Enum.GetValues(typeof(BonusType));
+            BonusType randomBonus = (BonusType)values.GetValue(_rng.Next(values.Length))!;
+            Bonuses.Add(new Bonus(block.X + block.Width / 2 - 15, block.Y + block.Height / 2 - 15, randomBonus));
+        }
+    }
+    
+    private void ApplyBonus(BonusType type)
+    {
+        switch (type)
+        {
+            case BonusType.Expand:
+                PaddleWidth = Math.Min(PaddleWidth + 40, CanvasWidth);
+                break;
+            case BonusType.Slow:
+                foreach(var ball in Balls)
+                {
+                    ball.VelocityX *= 0.7;
+                    ball.VelocityY *= 0.7;
+                }
+                break;
+            case BonusType.MultiBall:
+                var newBalls = new System.Collections.Generic.List<BallModel>();
+                foreach(var ball in Balls)
+                {
+                    var b1 = new BallModel(ball.X, ball.Y) { VelocityX = ball.VelocityX * -1.2, VelocityY = ball.VelocityY };
+                    var b2 = new BallModel(ball.X, ball.Y) { VelocityX = ball.VelocityX, VelocityY = ball.VelocityY * -1.2 };
+                    newBalls.Add(b1);
+                    newBalls.Add(b2);
+                }
+                foreach(var nb in newBalls) Balls.Add(nb);
+                break;
+            case BonusType.ExtraCash:
+                CurrentWinnings += BetAmount;
+                break;
+            case BonusType.StickyPaddle:
+                _hasStickyPaddle = true;
+                break;
+            case BonusType.Laser:
+                _hasLasers = true;
+                break;
+        }
+    }
+
+    public void TriggerAction()
+    {
+        if (!IsGameRunning) return;
+
+        bool releasedAny = false;
+        foreach (var ball in Balls.Where(b => b.IsStuck))
+        {
+            ball.IsStuck = false;
+            // Launch up
+            ball.VelocityY = -Math.Abs(ball.VelocityY);
+            if(ball.VelocityY == 0) ball.VelocityY = DefaultBallVelocityY;
+            releasedAny = true;
+        }
+
+        if (releasedAny)
+        {
+            _hasStickyPaddle = false; // Optional: lose sticky after release
+            return; 
+        }
+
+        if (_hasLasers)
+        {
+            Projectiles.Add(new Projectile(PaddleX + 10, PaddleY));
+            Projectiles.Add(new Projectile(PaddleX + PaddleWidth - 10 - 4, PaddleY));
         }
     }
 
@@ -229,7 +386,14 @@ public partial class ArkanoidViewModel : ObservableObject, IDisposable
     {
         if (IsGameRunning)
         {
+            double oldX = PaddleX;
             PaddleX = Math.Max(0, PaddleX - PaddleSpeed);
+            double delta = PaddleX - oldX;
+            
+            foreach(var ball in Balls.Where(b => b.IsStuck))
+            {
+                ball.X += delta;
+            }
         }
     }
 
@@ -237,7 +401,14 @@ public partial class ArkanoidViewModel : ObservableObject, IDisposable
     {
         if (IsGameRunning)
         {
+            double oldX = PaddleX;
             PaddleX = Math.Min(CanvasWidth - PaddleWidth, PaddleX + PaddleSpeed);
+            double delta = PaddleX - oldX;
+
+            foreach(var ball in Balls.Where(b => b.IsStuck))
+            {
+                ball.X += delta;
+            }
         }
     }
 

@@ -39,13 +39,21 @@ public partial class ArkanoidView : UserControl
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Left) _moveLeft = true;
-        if (e.Key == Key.Right) _moveRight = true;
+        if (e.Key == Key.A || e.Key == Key.Left) _moveLeft = true;
+        if (e.Key == Key.D || e.Key == Key.Right) _moveRight = true;
     }
 
     private void OnKeyUp(object? sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Left) _moveLeft = false;
-        if (e.Key == Key.Right) _moveRight = false;
+        if (e.Key == Key.A || e.Key == Key.Left) _moveLeft = false;
+        if (e.Key == Key.D || e.Key == Key.Right) _moveRight = false;
+        
+        if (e.Key == Key.Space)
+        {
+            if (DataContext is ArkanoidViewModel vm)
+            {
+                vm.TriggerAction();
+            }
+        }
     }
 }
