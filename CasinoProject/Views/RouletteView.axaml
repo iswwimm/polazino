@@ -1,0 +1,27 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:CasinoProject.ViewModels"
+             x:Class="CasinoProject.Views.RouletteView"
+             x:DataType="vm:RouletteViewModel">
+
+    <StackPanel Spacing="20" Margin="30" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+        <TextBlock Text="KASYNO - RULETKA" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center"/>
+
+        <TextBlock Text="{Binding WynikTekst}" FontSize="20" HorizontalAlignment="Center" Foreground="Red"/>
+
+        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+            <TextBlock Text="Stawka w $:" VerticalAlignment="Center"/>
+            <NumericUpDown Value="{Binding Stawka}" Minimum="1"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+            <TextBlock Text="Obstawiasz liczbę (0-36):" VerticalAlignment="Center"/>
+            <NumericUpDown Value="{Binding WybranaLiczba}" Minimum="0" Maximum="36"/>
+        </StackPanel>
+
+        <Button Content="ZAKRĘĆ!" Command="{Binding SpinCommand}" Width="150" HorizontalContentAlignment="Center"/>
+        <Button Content="Wróć do Menu" Command="{Binding GoBackCommand}" Width="150" HorizontalContentAlignment="Center"/>
+
+    </StackPanel>
+</UserControl>
