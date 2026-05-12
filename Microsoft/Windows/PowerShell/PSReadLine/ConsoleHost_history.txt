@@ -1,7 +1,0 @@
-if (Get-Module -Name PSReadLine) {$Global:VSReadLine = $function:PSConsoleHostReadLine;$env:GIT_PAGER='cat';$Global:VSPrompt = $function:Prompt;$Global:VSInCmd=$false;[console]::WindowHeight = 9999;function Global:PSConsoleHostReadLine { [Console]::Write("$([char]0x1b)]633;P$([char]0x1b)\"); $cmd = $Global:VSReadLine.Invoke(); $Global:VSInCmd = $true; [Console]::Write("$([char]0x1b)]633;C$([char]0x1b)\"); $cmd;};function Global:Prompt { $rc = [int]!$Global:?; $r = $Global:VSPrompt.Invoke(); if ($Global:VSInCmd -eq $true) { $r = "$([char]0x1b)]633;D;$rc;$([char]0x1b)\$r"; }; $Global:VSInCmd=$false; return $r;};};clear;
-cd "C:\Users\Савелій\source\repos\Ferofranki\polazino_test"; git rm --cached -r .vs/`
-
-cd C:\Users\Савелій\source\repos\Ferofranki\polazino_test; git status`
-
-cd "C:\Users\Савелій\source\repos\Ferofranki\polazino_test"; git add .gitignore; git commit -m "Update .gitignore to exclude .vs directory"`
-
