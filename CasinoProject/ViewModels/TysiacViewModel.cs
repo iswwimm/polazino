@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using CasinoProject.Core;
+using CasinoProject.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,66 +10,46 @@ using System.Threading.Tasks;
 
 namespace CasinoProject.ViewModels;
 
-public partial class TysiacViewModel : ViewModelBase
+public partial class TysiacViewModel : ObservableObject
 {
-    [ObservableProperty]
-    private int _betAmount = 10;
-
-    [ObservableProperty]
-    private string _statusMessage = "Postaw zakład i kliknij Graj!";
-
-    [ObservableProperty]
-    private string _playerCardsText = string.Empty;
-
-    [ObservableProperty]
-    private string _dealerCardsText = string.Empty;
-
-    [ObservableProperty]
-    private int _playerScore = 0;
-
-    [ObservableProperty]
-    private int _dealerScore = 0;
-
-    [ObservableProperty]
-    private bool _isProcessing = false;
-
-    public int CurrentBalance => SessionManager.Instance.Balance;
+    [ObservableProperty] private int _betAmount = 10;
+    [ObservableProperty] private string _statusMessage = "PLACE YOUR BET AND PLAY!";
+    [ObservableProperty] private string _playerCardsText = string.Empty;
+    [ObservableProperty] private string _dealerCardsText = string.Empty;
+    [ObservableProperty] private int _playerScore = 0;
+    [ObservableProperty] private int _dealerScore = 0;
+    [ObservableProperty] private bool _isProcessing = false;
 
     [RelayCommand]
     private async Task PlayRoundAsync()
     {
-        if (BetAmount <= 0)
-        {
-            StatusMessage = "Stawka musi być większa od 0!";
-            return;
-        }
+        if (BetAmount <= 0) { StatusMessage = "BET MUST BE GREATER THAN 0!"; return; }
 
         if (!SessionManager.Instance.TryDeduct(BetAmount))
         {
-            StatusMessage = "Brak wystarczających środków na koncie!";
+            StatusMessage = "INSUFFICIENT FUNDS!";
             return;
         }
 
         IsProcessing = true;
-        StatusMessage = "Tasowanie i rozdawanie kart...";
-        OnPropertyChanged(nameof(CurrentBalance));
+        StatusMessage = "SHUFFLING AND DEALING...";
 
-        var deck = GenerateDeck();
+        await Task.Delay(1000);
+
+        var deck = GenerateTysiacDeck();
         Shuffle(deck);
 
         var playerHand = deck.Take(6).ToList();
         var dealerHand = deck.Skip(6).Take(6).ToList();
 
-        PlayerCardsText = string.Join(" | ", playerHand.Select(c => c.ToString()));
-        DealerCardsText = string.Join(" | ", dealerHand.Select(c => c.ToString()));
+        PlayerCardsText = string.Join(" | ", playerHand.Select(c => $"{c.Rank}{c.SuitIcon}"));
+        DealerCardsText = string.Join(" | ", dealerHand.Select(c => $"{c.Rank}{c.SuitIcon}"));
 
         PlayerScore = CalculateScore(playerHand);
         DealerScore = CalculateScore(dealerHand);
 
         ResolveWinner();
-
         IsProcessing = false;
-        OnPropertyChanged(nameof(CurrentBalance));
     }
 
     private void ResolveWinner()
@@ -77,87 +58,74 @@ public partial class TysiacViewModel : ViewModelBase
         {
             int winnings = BetAmount * 2;
             SessionManager.Instance.AddWinnings(winnings);
-            StatusMessage = $"Wygrałeś! Zgarniasz {winnings}$. (Wynik: {PlayerScore} do {DealerScore})";
+            StatusMessage = $"WINNER! YOU WON ${winnings}!";
         }
         else if (PlayerScore == DealerScore)
         {
             SessionManager.Instance.AddWinnings(BetAmount);
-            StatusMessage = $"Remis! Stawka {BetAmount}$ wraca na konto. (Wynik: {PlayerScore} do {DealerScore})";
+            StatusMessage = $"DRAW! ${BetAmount} RETURNED.";
         }
         else
         {
-            StatusMessage = $"Przegrałeś. Krupier miał więcej punktów. (Wynik: {PlayerScore} do {DealerScore})";
+            StatusMessage = $"DEALER WINS! TRY AGAIN.";
         }
     }
 
-    private int CalculateScore(List<Card> hand)
+    private int CalculateScore(List<CasinoProject.Models.Card> hand)
     {
         int score = hand.Sum(c => c.Value);
-        var suits = new[] { "Pik", "Trefl", "Karo", "Kier" };
-        var marriageValues = new Dictionary<string, int>
-        {
-            { "Pik", 40 },
-            { "Trefl", 60 },
-            { "Karo", 80 },
-            { "Kier", 100 }
+        var marriages = new Dictionary<string, int> { 
+            { "♠", 40 }, { "♣", 60 }, { "♦", 80 }, { "♥", 100 } 
         };
 
-        foreach (var suit in suits)
+        foreach (var m in marriages)
         {
-            bool hasQueen = hand.Any(c => c.Suit == suit && c.Rank == "Q");
-            bool hasKing = hand.Any(c => c.Suit == suit && c.Rank == "K");
-
-            if (hasQueen && hasKing)
+            if (hand.Any(c => c.SuitIcon == m.Key && c.Rank == "Q") && 
+                hand.Any(c => c.SuitIcon == m.Key && c.Rank == "K"))
             {
-                score += marriageValues[suit];
+                score += m.Value;
             }
         }
-
         return score;
     }
 
-    private List<Card> GenerateDeck()
+    private List<CasinoProject.Models.Card> GenerateTysiacDeck()
     {
-        var suits = new[] { "Pik", "Trefl", "Karo", "Kier" };
-        var ranks = new Dictionary<string, int>
-        {
+        var suits = new[] { 
+            new { Name="Pik", Icon="♠", Color="Black" },
+            new { Name="Trefl", Icon="♣", Color="Black" },
+            new { Name="Karo", Icon="♦", Color="Red" },
+            new { Name="Kier", Icon="♥", Color="Red" }
+        };
+        var ranks = new Dictionary<string, int> {
             { "9", 0 }, { "J", 2 }, { "Q", 3 }, { "K", 4 }, { "10", 10 }, { "A", 11 }
         };
 
-        var deck = new List<Card>();
-        foreach (var suit in suits)
+        var deck = new List<CasinoProject.Models.Card>();
+        foreach (var s in suits)
         {
-            foreach (var rank in ranks)
+            foreach (var r in ranks)
             {
-                deck.Add(new Card { Suit = suit, Rank = rank.Key, Value = rank.Value });
+                var card = new CasinoProject.Models.Card(s.Name, r.Key, r.Value);
+
+                deck.Add(card);
             }
         }
+
         return deck;
     }
 
-    private void Shuffle(List<Card> deck)
+    private void Shuffle<T>(List<T> list)
     {
         var rng = new Random();
-        int n = deck.Count;
-        while (n > 1)
-        {
+        int n = list.Count;
+        while (n > 1) {
             n--;
             int k = rng.Next(n + 1);
-            (deck[k], deck[n]) = (deck[n], deck[k]);
+            (list[k], list[n]) = (list[n], list[k]);
         }
     }
 
     [RelayCommand]
-    private void GoBackToMenu()
-    {
-        WeakReferenceMessenger.Default.Send(new NavigationMessage("Menu"));
-    }
-}
-public class Card
-{
-    public string Suit { get; set; } = string.Empty;
-    public string Rank { get; set; } = string.Empty;
-    public int Value { get; set; }
-
-    public override string ToString() => $"{Rank} {Suit}";
+    private void GoBackToMenu() => WeakReferenceMessenger.Default.Send(new NavigationMessage("Menu"));
 }

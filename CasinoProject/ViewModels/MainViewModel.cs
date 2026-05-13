@@ -34,9 +34,8 @@ public partial class MainViewModel : ObservableObject, IRecipient<NavigationMess
     {
         CurrentView = new MenuViewModel();
     }
-
     [RelayCommand]
-    private void PlayTysiac()
+    private void PlayThousand()
     {
         CurrentView = new TysiacViewModel();
     }
@@ -46,7 +45,7 @@ public partial class MainViewModel : ObservableObject, IRecipient<NavigationMess
         {
             CurrentView = new TopUpViewModel();
         }
-        else if (message.TargetView == "Tysiac")
+        else if (message.TargetView == "Thousand")
         {
             CurrentView = new TysiacViewModel();
         }

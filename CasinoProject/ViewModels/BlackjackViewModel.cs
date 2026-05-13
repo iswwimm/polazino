@@ -26,9 +26,9 @@ public partial class BlackjackViewModel : ObservableObject
 
     [ObservableProperty]
     private int? _betAmount = 10;
-
-    public ObservableCollection<Card> PlayerCards { get; } = new();
-    public ObservableCollection<Card> DealerCards { get; } = new();
+    
+    public ObservableCollection<CasinoProject.Models.Card> PlayerCards { get; } = new();
+    public ObservableCollection<CasinoProject.Models.Card> DealerCards { get; } = new();
 
     public BlackjackViewModel()
     {
@@ -38,7 +38,7 @@ public partial class BlackjackViewModel : ObservableObject
     [RelayCommand]
     private void StartNewGame()
     {
-        if ( BetAmount == null || BetAmount <= 0)
+        if (!BetAmount.HasValue || BetAmount.Value <= 0)
         {
             GameStatus = "BET MUST BE GREATER THAN 0!";
             return;
@@ -51,10 +51,10 @@ public partial class BlackjackViewModel : ObservableObject
             DealerCards.Clear();
             IsGameActive = true;
             GameStatus = "YOUR TURN! HIT OR STAND?";
-
-            PlayerCards.Add(_deck.Draw());
-            PlayerCards.Add(_deck.Draw());
-            DealerCards.Add(_deck.Draw()); 
+            
+            PlayerCards.Add((CasinoProject.Models.Card)_deck.Draw());
+            PlayerCards.Add((CasinoProject.Models.Card)_deck.Draw());
+            DealerCards.Add((CasinoProject.Models.Card)_deck.Draw()); 
 
             UpdateScores();
         }
@@ -69,7 +69,7 @@ public partial class BlackjackViewModel : ObservableObject
     {
         if (!IsGameActive) return;
 
-        PlayerCards.Add(_deck.Draw());
+        PlayerCards.Add((CasinoProject.Models.Card)_deck.Draw());
         UpdateScores();
 
         if (PlayerScore > 21)
@@ -85,7 +85,7 @@ public partial class BlackjackViewModel : ObservableObject
         
         while (CalculateHandScore(DealerCards) < 17)
         {
-            DealerCards.Add(_deck.Draw());
+            DealerCards.Add((CasinoProject.Models.Card)_deck.Draw());
         }
 
         UpdateScores();
@@ -104,7 +104,7 @@ public partial class BlackjackViewModel : ObservableObject
         DealerScore = CalculateHandScore(DealerCards);
     }
 
-    private int CalculateHandScore(ObservableCollection<Card> hand)
+    private int CalculateHandScore(ObservableCollection<CasinoProject.Models.Card> hand)
     {
         int score = hand.Sum(c => c.Value);
         int aceCount = hand.Count(c => c.Rank == "A");
@@ -119,15 +119,17 @@ public partial class BlackjackViewModel : ObservableObject
 
     private void DetermineWinner()
     {
+        int currentBet = BetAmount ?? 0;
+
         if (DealerScore > 21)
         {
             EndGame("DEALER BUSTS! YOU WIN!");
-            SessionManager.Instance.AddWinnings(BetAmount.Value * 2);
+            SessionManager.Instance.AddWinnings(currentBet * 2);
         }
         else if (PlayerScore > DealerScore)
         {
             EndGame("YOU WIN!");
-            SessionManager.Instance.AddWinnings(BetAmount.Value * 2);
+            SessionManager.Instance.AddWinnings(currentBet * 2);
         }
         else if (DealerScore > PlayerScore)
         {
@@ -136,7 +138,7 @@ public partial class BlackjackViewModel : ObservableObject
         else
         {
             EndGame("PUSH! BET RETURNED.");
-            SessionManager.Instance.AddWinnings(BetAmount.Value);
+            SessionManager.Instance.AddWinnings(currentBet);
         }
     }
 
