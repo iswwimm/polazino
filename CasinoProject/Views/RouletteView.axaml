@@ -4,24 +4,97 @@
              x:Class="CasinoProject.Views.RouletteView"
              x:DataType="vm:RouletteViewModel">
 
-    <StackPanel Spacing="20" Margin="30" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <UserControl.Styles>
+        <Style Selector="NumericUpDown">
+            <Setter Property="Background" Value="#0f121a"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
+            <Setter Property="BorderBrush" Value="#1Affffff"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style Selector="NumericUpDown:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="#38ef7d"/> 
+            <Setter Property="Background" Value="#0f121a"/>
+        </Style>
+        
+        <Style Selector="Button.ActionBtn">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Black"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="0,18"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="LetterSpacing" Value="1"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.ActionBtn:pointerover">
+            <Setter Property="RenderTransform" Value="translateY(-4px)"/>
+        </Style>
+    </UserControl.Styles>
 
-        <TextBlock Text="KASYNO - RULETKA" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center"/>
+    <Grid Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        
+        <Border Width="450" Background="#161b28" CornerRadius="24" Padding="40" 
+                BorderBrush="#1Affffff" BorderThickness="1"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                BoxShadow="0 25 50 0 #99000000">
+            
+            <StackPanel Spacing="15">
+                
+                <Button Content="✕" Command="{Binding GoBackCommand}" 
+                        Background="Transparent" Foreground="#8b92a5" FontSize="20" FontWeight="Bold"
+                        HorizontalAlignment="Right" Margin="0,-20,-20,0" Padding="10"
+                        IsEnabled="{Binding !IsSpinning}"/>
 
-        <TextBlock Text="{Binding WynikTekst}" FontSize="20" HorizontalAlignment="Center" Foreground="Red"/>
+                <TextBlock Text="LIVE ROULETTE" FontSize="26" FontWeight="Black" LetterSpacing="2"
+                           Foreground="#38ef7d" HorizontalAlignment="Center" Margin="0,-10,0,5"/>
 
-        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-            <TextBlock Text="Stawka w $:" VerticalAlignment="Center"/>
-            <NumericUpDown Value="{Binding Stawka}" Minimum="1"/>
-        </StackPanel>
+                <Border Width="100" Height="100" CornerRadius="50" 
+                        Background="#0b0e14" BorderBrush="#38ef7d" BorderThickness="3"
+                        HorizontalAlignment="Center" Margin="0,5,0,10"
+                        BoxShadow="0 0 25 0 #4038ef7d">
+                    <TextBlock Text="{Binding CurrentSpinNumber}" 
+                               Foreground="White" FontSize="42" FontWeight="Black"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
 
-        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-            <TextBlock Text="Obstawiasz liczbę (0-36):" VerticalAlignment="Center"/>
-            <NumericUpDown Value="{Binding WybranaLiczba}" Minimum="0" Maximum="36"/>
-        </StackPanel>
+                <Grid ColumnDefinitions="*, 20, *">
+                    <StackPanel Grid.Column="0" Spacing="5">
+                        <TextBlock Text="BET AMOUNT ($)" Foreground="#8b92a5" FontSize="11" FontWeight="Bold" LetterSpacing="1"/>
+                        <NumericUpDown Value="{Binding BetAmount}" Minimum="1" Maximum="10000" 
+                                       IsEnabled="{Binding !IsSpinning}" Height="45" FontSize="16" FontWeight="Bold"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="2" Spacing="5">
+                        <TextBlock Text="NUMBER (0-36)" Foreground="#8b92a5" FontSize="11" FontWeight="Bold" LetterSpacing="1"/>
+                        <NumericUpDown Value="{Binding SelectedNumber}" Minimum="0" Maximum="36" 
+                                       IsEnabled="{Binding !IsSpinning}" Height="45" FontSize="16" FontWeight="Bold"/>
+                    </StackPanel>
+                </Grid>
 
-        <Button Content="ZAKRĘĆ!" Command="{Binding SpinCommand}" Width="150" HorizontalContentAlignment="Center"/>
-        <Button Content="Wróć do Menu" Command="{Binding GoBackCommand}" Width="150" HorizontalContentAlignment="Center"/>
+                <Button Classes="ActionBtn" Content="SPIN THE WHEEL!" Command="{Binding SpinCommand}" 
+                        Margin="0,15,0,0" IsEnabled="{Binding !IsSpinning}">
+                    <Button.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                            <GradientStop Color="#11998e" Offset="0"/>
+                            <GradientStop Color="#38ef7d" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                </Button>
 
-    </StackPanel>
+                <TextBlock Text="{Binding ResultText}" Foreground="#f5c518" 
+                           FontWeight="Black" FontSize="14" HorizontalAlignment="Center" 
+                           TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,0"
+                           MinHeight="20"/>
+                
+            </StackPanel>
+        </Border>
+    </Grid>
 </UserControl>

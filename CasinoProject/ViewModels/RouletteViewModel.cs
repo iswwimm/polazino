@@ -1,47 +1,74 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using CasinoProject.Core;
 
-namespace CasinoProject.ViewModels
+namespace CasinoProject.ViewModels;
+
+public partial class RouletteViewModel : ObservableObject
 {
-    public partial class RouletteViewModel : ObservableObject
+    [ObservableProperty] 
+    private int _betAmount = 10;
+    
+    [ObservableProperty] 
+    private int _selectedNumber = 0;
+    
+    [ObservableProperty] 
+    private string _resultText = "PLACE YOUR BET AND SPIN!";
+    
+    [ObservableProperty] 
+    private bool _isSpinning = false;
+
+    // НОВА ЗМІННА: Відображає число на цифровому табло
+    [ObservableProperty] 
+    private string _currentSpinNumber = "--";
+
+    [RelayCommand]
+    private async Task SpinAsync()
     {
-        [ObservableProperty] private int _stawka = 10;
-        [ObservableProperty] private int _wybranaLiczba = 0;
-        [ObservableProperty] private string _wynikTekst = "Postaw zakład i zakręć!";
-
-        private readonly Random _random = new Random();
-
-        [RelayCommand]
-        private void Spin()
+        if (BetAmount <= 0)
         {
-            if (SessionManager.Instance.TryDeduct(Stawka))
-            {
-                int wylosowana = _random.Next(0, 37);
-
-                if (wylosowana == WybranaLiczba)
-                {
-                    int wygrana = Stawka * 36;
-                    SessionManager.Instance.AddWinnings(wygrana);
-                    WynikTekst = $"WYGRANA! Wypadło {wylosowana}. Zarabiasz {wygrana}$!";
-                }
-                else
-                {
-                    WynikTekst = $"Pudło! Wypadło {wylosowana}. Przegrywasz stawkę.";
-                }
-            }
-            else
-            {
-                WynikTekst = "Brak kasy! Doładuj portfel.";
-            }
+            ResultText = "Bet amount must be greater than zero!";
+            return;
         }
 
-        [RelayCommand]
-        private void GoBack()
+        if (!SessionManager.Instance.TryDeduct(BetAmount))
         {
-            WeakReferenceMessenger.Default.Send(new NavigationMessage("Menu"));
+            ResultText = "INSUFFICIENT FUNDS! DEPOSIT FIRST.";
+            return;
         }
+
+        IsSpinning = true;
+        ResultText = "SPINNING THE WHEEL... 🎡";
+        
+        for (int i = 0; i < 20; i++)
+        {
+            CurrentSpinNumber = Random.Shared.Next(0, 37).ToString();
+            await Task.Delay(100); // Чекаємо 1/10 секунди
+        }
+        
+        int winningNumber = Random.Shared.Next(0, 37);
+        CurrentSpinNumber = winningNumber.ToString();
+
+        if (winningNumber == SelectedNumber)
+        {
+            int winnings = BetAmount * 36;
+            SessionManager.Instance.AddWinnings(winnings);
+            ResultText = $"WINNER! YOU WON ${winnings}!";
+        }
+        else
+        {
+            ResultText = $"LOSS! TRY AGAIN.";
+        }
+
+        IsSpinning = false;
+    }
+
+    [RelayCommand]
+    private void GoBack()
+    {
+        WeakReferenceMessenger.Default.Send(new NavigationMessage("Menu"));
     }
 }

@@ -53,5 +53,9 @@ public partial class MainViewModel : ObservableObject, IRecipient<NavigationMess
         {
             CurrentView = new ArkanoidViewModel();
         }
+        else if (message.TargetView == "Roulette")
+        {
+            CurrentView = new RouletteViewModel();
+        }
     }
 }
