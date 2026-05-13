@@ -20,8 +20,7 @@ public partial class RouletteViewModel : ObservableObject
     
     [ObservableProperty] 
     private bool _isSpinning = false;
-
-    // НОВА ЗМІННА: Відображає число на цифровому табло
+    
     [ObservableProperty] 
     private string _currentSpinNumber = "--";
 
@@ -46,7 +45,7 @@ public partial class RouletteViewModel : ObservableObject
         for (int i = 0; i < 20; i++)
         {
             CurrentSpinNumber = Random.Shared.Next(0, 37).ToString();
-            await Task.Delay(100); // Чекаємо 1/10 секунди
+            await Task.Delay(100);
         }
         
         int winningNumber = Random.Shared.Next(0, 37);

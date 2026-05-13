@@ -4,83 +4,157 @@
              x:Class="CasinoProject.Views.BlackjackView"
              x:DataType="vm:BlackjackViewModel">
 
-    <Grid RowDefinitions="Auto, *, Auto" Margin="20">
+    <UserControl.Styles>
+        <Style Selector="NumericUpDown">
+            <Setter Property="Background" Value="#0f121a"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
+            <Setter Property="BorderBrush" Value="#1Affffff"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="FontSize" Value="16"/>
+        </Style>
+        <Style Selector="NumericUpDown:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="#2980b9"/> 
+        </Style>
+        
+        <Style Selector="Button.ActionBtn">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Black"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="20,15"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="LetterSpacing" Value="1"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.ActionBtn:pointerover">
+            <Setter Property="RenderTransform" Value="translateY(-3px)"/>
+        </Style>
+        
+        <Style Selector="Border.PlayingCard">
+            <Setter Property="Width" Value="85"/>
+            <Setter Property="Height" Value="125"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BorderBrush" Value="#333333"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BoxShadow" Value="0 10 20 0 #80000000"/>
+        </Style>
+    </UserControl.Styles>
 
-        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="0,0,0,20">
-            <Button Grid.Column="0" Content="← Wróć do Menu" Command="{Binding GoBackToMenu}"
-                    Background="Transparent" Foreground="#5c667a" FontSize="16" FontWeight="Bold"/>
+    <Grid Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        
+        <Border Width="800" Background="#161b28" CornerRadius="24" Padding="40" 
+                BorderBrush="#1Affffff" BorderThickness="1"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                BoxShadow="0 25 50 0 #99000000">
 
-            <TextBlock Grid.Column="1" Text="{Binding GameStatus}" Foreground="White" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center"/>
-        </Grid>
+            <Grid RowDefinitions="Auto, *, Auto">
 
-        <Border Grid.Row="1" CornerRadius="20" BorderBrush="#f5c518" BorderThickness="2" Background="#165e33">
-            <Grid RowDefinitions="*, *">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,20">
+                    <TextBlock Grid.Column="1" Text="♠️ BLACKJACK PRO" Foreground="#2980b9" FontSize="26" FontWeight="Black" LetterSpacing="2" HorizontalAlignment="Center"/>
+                    <Button Grid.Column="2" Content="✕" Command="{Binding GoBackToMenuCommand}" 
+                            Background="Transparent" Foreground="#8b92a5" FontSize="20" FontWeight="Bold" Padding="10"/>
+                </Grid>
 
-                <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding DealerScore, StringFormat='Krupier: {0}'}" Foreground="#f5c518" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                    <ItemsControl ItemsSource="{Binding DealerCards}">
-                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="10"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Width="85" Height="125" Background="White" CornerRadius="8" BorderBrush="#333333" BorderThickness="1">
-                                    <Grid>
-                                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,3,0,0">
-                                            <TextBlock Text="{Binding Rank}" Foreground="{Binding SuitColor}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                            <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="14" HorizontalAlignment="Center"/>
-                                        </StackPanel>
+                <Border Grid.Row="1" CornerRadius="20" BorderBrush="#15ffffff" BorderThickness="1" ClipToBounds="True" Margin="0,0,0,20">
+                    <Border.Background>
+                        <RadialGradientBrush Center="50%,50%" RadiusX="100%" RadiusY="100%">
+                            <GradientStop Color="#0a1f16" Offset="0"/> 
+                            <GradientStop Color="#080b12" Offset="1"/> 
+                        </RadialGradientBrush>
+                    </Border.Background>
+                    
+                    <Grid RowDefinitions="*, *" Margin="30">
+                        <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding DealerScore, StringFormat='DEALER SCORE: {0}'}" Foreground="#8b92a5" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15" LetterSpacing="1"/>
+                            
+                            <ItemsControl ItemsSource="{Binding DealerCards}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20,0,0,0"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Classes="PlayingCard" Margin="-20,0,0,0">
+                                            <Grid>
+                                                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,3,0,0">
+                                                    <TextBlock Text="{Binding Rank}" Foreground="{Binding SuitColor}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="14" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="45" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,3">
+                                                    <TextBlock Text="{Binding Rank}" Foreground="{Binding SuitColor}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="14" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
 
-                                        <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="45" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,0,0">
+                            <ItemsControl ItemsSource="{Binding PlayerCards}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20,0,0,0"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Classes="PlayingCard" Margin="-20,0,0,0">
+                                            <Grid>
+                                                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,3,0,0">
+                                                    <TextBlock Text="{Binding Rank}" Foreground="{Binding SuitColor}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="14" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="45" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,3">
+                                                    <TextBlock Text="{Binding Rank}" Foreground="{Binding SuitColor}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="14" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            
+                            <TextBlock Text="{Binding PlayerScore, StringFormat='YOUR SCORE: {0}'}" Foreground="#f5c518" FontSize="16" FontWeight="Black" HorizontalAlignment="Center" Margin="0,15,0,0" LetterSpacing="1"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
 
-                                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,3">
-                                            <TextBlock Text="{Binding Rank}" Foreground="{Binding SuitColor}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                            <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="14" HorizontalAlignment="Center"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
+                <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
+                    <TextBlock Grid.Column="0" Text="{Binding GameStatus}" Foreground="#ff007f" FontSize="18" FontWeight="Black" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="15" HorizontalAlignment="Right">
+                        
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="10" IsVisible="{Binding !IsGameActive}">
+                            <TextBlock Text="BET ($)" Foreground="#8b92a5" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <NumericUpDown Value="{Binding BetAmount}" Minimum="1" Maximum="1000" Width="130"/>
+                        </StackPanel>
 
-                <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <ItemsControl ItemsSource="{Binding PlayerCards}">
-                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="10"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Width="85" Height="125" Background="White" CornerRadius="8" BorderBrush="#333333" BorderThickness="1">
-                                    <Grid>
-                                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,3,0,0">
-                                            <TextBlock Text="{Binding Rank}" Foreground="{Binding SuitColor}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                            <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="14" HorizontalAlignment="Center"/>
-                                        </StackPanel>
+                        <Button Classes="ActionBtn" Content="HIT ➕" Command="{Binding HitCommand}" IsVisible="{Binding IsGameActive}" Width="130" Background="#ff007f"/>
+                        <Button Classes="ActionBtn" Content="STAND 🛑" Command="{Binding StandCommand}" IsVisible="{Binding IsGameActive}" Width="130" Background="#2c3e50"/>
+                        <Button Classes="ActionBtn" Content="NEW GAME" Command="{Binding StartNewGameCommand}" IsVisible="{Binding !IsGameActive}" Width="180">
+                            <Button.Background>
+                                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                    <GradientStop Color="#ff8a00" Offset="0"/>
+                                    <GradientStop Color="#f5c518" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Button.Background>
+                        </Button>
+                    </StackPanel>
+                </Grid>
 
-                                        <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="45" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
-                                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,3">
-                                            <TextBlock Text="{Binding Rank}" Foreground="{Binding SuitColor}" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                            <TextBlock Text="{Binding SuitIcon}" Foreground="{Binding SuitColor}" FontSize="14" HorizontalAlignment="Center"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <TextBlock Text="{Binding PlayerScore, StringFormat='Ty: {0}'}" Foreground="#f5c518" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-                </StackPanel>
             </Grid>
         </Border>
-
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="0,20,0,0">
-
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="10" IsEnabled="{Binding !IsGameActive}">
-                <TextBlock Text="Stawka: $" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
-                <NumericUpDown Value="{Binding BetAmount}" Increment="10" Minimum="1" Maximum="1000" Width="120" Height="45" FontSize="16"/>
-            </StackPanel>
-
-            <Button Content="Dobierz (HIT)" Command="{Binding Hit}" IsEnabled="{Binding IsGameActive}" Width="150" Height="45" Background="#ff007f" Foreground="White" FontSize="16" FontWeight="Bold" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" CornerRadius="10"/>
-            <Button Content="Pasuj (STAND)" Command="{Binding Stand}" IsEnabled="{Binding IsGameActive}" Width="150" Height="45" Background="#1c212e" BorderBrush="#ff007f" BorderThickness="2" Foreground="White" FontSize="16" FontWeight="Bold" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" CornerRadius="10"/>
-            <Button Content="Nowa Gra" Command="{Binding StartNewGame}" IsEnabled="{Binding !IsGameActive}" Width="150" Height="45" Background="#f5c518" Foreground="Black" FontSize="16" FontWeight="Bold" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" CornerRadius="10"/>
-        </StackPanel>
-
     </Grid>
 </UserControl>
