@@ -5,3 +5,7 @@ riderModule.iml
 /_ReSharper.Caches/
 .idea/
 .vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates

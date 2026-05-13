@@ -130,6 +130,34 @@
                     </Grid>
                 </Border>
 
+                <Border Classes="GameCard" CornerRadius="16" BorderBrush="#15ffffff" BorderThickness="1" Margin="0,0,25,25" ClipToBounds="True" Cursor="Hand">
+                    <Border.Background>
+                        <RadialGradientBrush Center="50%,100%" RadiusX="150%" RadiusY="150%">
+                            <GradientStop Color="#4e54c8" Offset="0"/>
+                            <GradientStop Color="#8f94fb" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Border.Background>
+                    <Grid>
+                        <Border>
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
+                                    <GradientStop Color="#E6000000" Offset="0"/>
+                                    <GradientStop Color="#00000000" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                        </Border>
+
+                        <Button Classes="PlayBtn" Command="{Binding PlayArkanoidCommand}" Content="PLAY NOW"
+                                Background="#ff007f" Foreground="White" FontWeight="Black" LetterSpacing="1"
+                                CornerRadius="30" Padding="30,12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                        <StackPanel VerticalAlignment="Bottom" Margin="20">
+                            <TextBlock Text="ARKANOID CASINO" Foreground="White" FontSize="22" FontWeight="Black" LetterSpacing="1"/>
+                            <TextBlock Text="PolAzino Originals" Foreground="#f5c518" FontSize="12" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
             </WrapPanel>
         </StackPanel>
     </Grid>
