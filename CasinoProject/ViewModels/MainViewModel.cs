@@ -34,12 +34,21 @@ public partial class MainViewModel : ObservableObject, IRecipient<NavigationMess
     {
         CurrentView = new MenuViewModel();
     }
-    
+
+    [RelayCommand]
+    private void PlayTysiac()
+    {
+        CurrentView = new TysiacViewModel();
+    }
     public void Receive(NavigationMessage message)
     {
         if (message.TargetView == "TopUp")
         {
             CurrentView = new TopUpViewModel();
+        }
+        else if (message.TargetView == "Tysiac")
+        {
+            CurrentView = new TysiacViewModel();
         }
         else if (message.TargetView == "Withdraw")
         {

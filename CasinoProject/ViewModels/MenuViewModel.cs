@@ -24,7 +24,13 @@ public partial class MenuViewModel : ObservableObject
     {
         WeakReferenceMessenger.Default.Send(new NavigationMessage("Blackjack"));
     }
-    
+
+    [RelayCommand]
+    private void PlayTysiac()
+    {
+        WeakReferenceMessenger.Default.Send(new NavigationMessage("Tysiac"));
+    }
+
     [RelayCommand]
     private void PlayArkanoid()
     {
