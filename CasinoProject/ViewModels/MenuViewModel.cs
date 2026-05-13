@@ -26,6 +26,12 @@ public partial class MenuViewModel : ObservableObject
     }
     
     [RelayCommand]
+    private void PlayArkanoid()
+    {
+        WeakReferenceMessenger.Default.Send(new NavigationMessage("Arkanoid"));
+    }
+
+    [RelayCommand]
     private void GoToTopUp()
     {
         WeakReferenceMessenger.Default.Send(new NavigationMessage("TopUp"));
